@@ -10,7 +10,6 @@ Wordle for Terminal.
 */
 
 #include <stdio.h>
-//#include <system.h>
 #include <termios.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -22,7 +21,7 @@ Wordle for Terminal.
 
 #define dummyWord "ERASE\0"
 #define MAX_TEXTBOX 6
-//words in the dictionary file should have 5 chars and a 0x10 at the end
+//words in the dictionary file should have 5 chars and a 0x0A at the end
 #define SEPARATOR 0x0A
 #define DICTIONARY "dict.txt"
 
@@ -505,17 +504,17 @@ void cleanArea()
 void displayHelp(){
   char ch=0; 
    cleanArea();
-   write_str(1,oldy,"C- WORDLE", B_WHITE, F_BLACK);
-   write_str(1,oldy+1,"Type <exit> or <quit> to exit.", B_BLACK, F_WHITE);
-   write_str(1,oldy+2,"Guess a 5-letter secret word in 6 tries.", B_BLACK, F_WHITE);
-   write_str(1,oldy+3,"Type a any word to start.", B_BLACK, F_WHITE);
-   write_str(1,oldy+5,"[C]", B_GREEN, F_WHITE);
-   write_str(4,oldy+5,"-> LETTER IS IN THE RIGHT POSITION", B_BLACK, F_WHITE);
-   write_str(1,oldy+6,"[C]", B_YELLOW, F_WHITE);
-   write_str(4,oldy+6,"-> LETTER IS IN THE WRONG POSITION", B_BLACK, F_WHITE);
-   write_str(1,oldy+7,"[C]", B_BLACK, F_WHITE);
-   write_str(4,oldy+7,"-> LETTER IS NOT IN THE WORD", B_BLACK, F_WHITE);
-   write_str(1,oldy+9,"Type <cheat> to give up", B_BLACK, F_WHITE);
+   write_str(1,oldy,"C-WORDLE", B_WHITE, F_BLACK);
+   write_str(1,oldy+1,"Guess a 5-letter secret word in 6 tries.", B_BLACK, F_WHITE);
+   write_str(1,oldy+2,"Type any word to start.", B_BLACK, F_WHITE);
+   write_str(1,oldy+4,"[C]", B_GREEN, F_WHITE);
+   write_str(4,oldy+4,"-> LETTER IS IN THE RIGHT POSITION", B_BLACK, F_WHITE);
+   write_str(1,oldy+5,"[C]", B_YELLOW, F_WHITE);
+   write_str(4,oldy+5,"-> LETTER IS IN THE WRONG POSITION", B_BLACK, F_WHITE);
+   write_str(1,oldy+6,"[C]", B_BLACK, F_WHITE);
+   write_str(4,oldy+6,"-> LETTER IS NOT IN THE WORD", B_BLACK, F_WHITE);
+   write_str(1,oldy+8,"Type <exit> or <quit> to exit.", B_BLACK, F_WHITE);
+   write_str(1,oldy+9,"Type <cheat> to give up.", B_BLACK, F_WHITE);
    write_str(1,oldy+11,"Words: ", B_BLACK, F_GREY);
    write_num(10,oldy+11,words, B_BLACK, F_GREY);
    write_str(1,oldy+13, "Press <ENTER> or <ESC> key to return.", B_BLACK, F_WHITE);
@@ -634,6 +633,7 @@ int cheat=0;
      if (strcmp(textbox1,"exit") ==0 || strcmp(textbox1,"quit") == 0)
       break;
      if (strcmp(textbox1,"cheat") == 0){
+       write_str(17,oldy+20,"                                           ", B_BLACK, F_GREEN);
        write_str(18,oldy+20,secretWord, B_BLACK, F_GREEN);
        memset(&textbox1,'\0',sizeof(textbox1));
        cheat=1;
@@ -647,24 +647,24 @@ int cheat=0;
          if (isWordinDictionary(fileSource,textbox1) == 1) {
              writeWord(currentIndex, textbox1);
              strcpy(boardInputs[currentIndex], textbox1);
-             write_str(wherex+16,wherey+2,"-> VALID WORD!                  ", B_BLACK, F_GREEN);
+             write_str(wherex+16,wherey+2,"->VALID WORD!                   ", B_BLACK, F_GREEN);
              if (currentIndex<6) currentIndex++;
              if (strcmp(textbox1,secretWord) == 0){
-               write_str(wherex,wherey+1,"-> SUCCESS!                       ", B_BLACK, F_BLUE);
+               write_str(wherex,wherey+1,"->SUCCESS!                        ", B_BLACK, F_BLUE);
                break;
               } else{
              if (currentIndex == 6) {
-              write_str(wherex,wherey+1,"-> GAME OVER:                     ", B_BLACK, F_MAGENTA);
+              write_str(wherex,wherey+1,"->GAME OVER:                     ", B_BLACK, F_MAGENTA);
               write_str(wherex+14,wherey+1,secretWord, B_BLACK, F_GREEN);
              break;
             }
           }
          } else {   
-            write_str(wherex+16,wherey+2,"-> WORD NOT FOUND!               ", B_BLACK, F_RED);
+            write_str(wherex+16,wherey+2,"->WORD NOT FOUND!                ", B_BLACK, F_RED);
          }
     }
      else{
-       if (cheat==0) write_str(wherex+16,wherey+2,"-> TOO SHORT!                         ", B_BLACK, F_RED);
+       if (cheat==0) write_str(wherex+16,wherey+2,"->TOO SHORT!                          ", B_BLACK, F_RED);
     }
   } while (ch!= K_ESCAPE);
    write_str(1,wherey+2,"                                 ", B_BLACK,F_WHITE);
@@ -781,7 +781,7 @@ void credits(){
   resetTerm();
   gotoxy(wherex,wherey+2);
   printf("\r");
-  printf("C-Wordle. Coded by v3l0r3k 2022  \n");
+  printf("C-Wordle. Coded by v3l0r3k 2022                     \n");
   showcursor();
   resetAnsi(0);
 }
