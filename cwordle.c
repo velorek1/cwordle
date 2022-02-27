@@ -24,6 +24,7 @@ Wordle for Terminal.
 //words in the dictionary file should have 5 chars and a 0x0A at the end
 #define SEPARATOR 0x0A
 #define DICTIONARY "dict.txt"
+#define POSSIBLES "possible.txt"
 
 //UNICODE chars
 #define HOR_LINE 9472
@@ -80,9 +81,11 @@ int currentIndex = 0;
 int     okFile;
 int dictionaryPresent = 0;
 FILE   *fileSource;
+FILE   *fileSource2;
 time_t t;
 unsigned randomWord=0;
 unsigned words=0;
+unsigned words2=0;
 //PROTOTYPES
 //Terminal
 int kbhit();
@@ -511,8 +514,10 @@ void displayHelp(){
    write_str(4,oldy+6,"-> LETTER IS NOT IN THE WORD", B_BLACK, F_WHITE);
    write_str(1,oldy+8,"Type <exit> or <quit> to exit.", B_BLACK, F_WHITE);
    write_str(1,oldy+9,"Type <cheat> to give up.", B_BLACK, F_WHITE);
-   write_str(1,oldy+11,"Words: ", B_BLACK, F_GREY);
-   write_num(10,oldy+11,words, B_BLACK, F_GREY);
+   write_str(1,oldy+10,"Total words: ", B_BLACK, F_GREY);
+   write_num(16,oldy+10,words, B_BLACK, F_GREY);
+   write_str(1,oldy+11,"Possible words: ", B_BLACK, F_GREY);
+   write_num(18,oldy+11,words2, B_BLACK, F_GREY);
    write_str(1,oldy+13, "Press <ENTER> or <ESC> key to return.", B_BLACK, F_WHITE);
    wherex=oldx;
    wherey=oldy;
@@ -593,7 +598,7 @@ void writeWord(int index, char text[MAX_TEXTBOX]){
        }
     //Search for Orange and Black letters
     x = oldx + 6;
-    for (i=0; i<MAX_TEXTBOX; i++)
+    for (i=0; i<5; i++)
        {
            col=checkOrange(text[i], i, secretWord);
            write_ch(x, y, text[i], col, F_WHITE);
@@ -723,8 +728,8 @@ void getWordfromDictionary(FILE * fileHandler, char WORD[MAX_TEXTBOX]) {
     ch = getc(fileHandler);	//peek into file
     while(i<5) {
       //Read until SEPARATOR 0x0A
-      if (ch!= SEPARATOR) dataString[i] = ch;
-      i++;
+      if (ch!= SEPARATOR) dataString[i++] = ch;
+      //i++;
       ch = getc(fileHandler);
     }
   }
@@ -745,8 +750,8 @@ int isWordinDictionary(FILE * fileHandler, char WORD[MAX_TEXTBOX]) {
     ch = getc(fileHandler);	//peek into file
     while(!feof(fileHandler)) {
       //Read until SEPARATOR 0x0A
-      if (ch != SEPARATOR) dataString[i] = ch;
-      i++;
+      if (ch != SEPARATOR) dataString[i++] = ch;
+      //i++;
       if(ch == SEPARATOR) {
 	dataString[i] = '\0';	// null-end string
         if (strcmp(dataString, WORD) == 0) {isFound = 1; break;}
@@ -793,6 +798,7 @@ int main(){
    }
    //SEARCH FOR DICTIONARY
    okFile = openFile(&fileSource, DICTIONARY, "r");
+   okFile = openFile(&fileSource2, POSSIBLES, "r");
    if (okFile == 0) {
      //No dictionary
      dictionaryPresent = 0;
@@ -803,11 +809,11 @@ int main(){
    } else {
      //Dictionary is present
      dictionaryPresent = 1;
-     countWords(fileSource);
      words = countWords(fileSource);
+     words2 = countWords(fileSource2);
      //Selecting a random word from dictionary
-     randomWord = rand() % words;
-     getWordfromDictionary(fileSource, secretWord);
+     randomWord = rand() % words2;
+     getWordfromDictionary(fileSource2, secretWord);
      pushTerm();
      hidecursor();
      resetch();
@@ -816,6 +822,7 @@ int main(){
      //GAME
      newGame();
      if (fileSource != NULL) closeFile(fileSource);
+     if (fileSource2 != NULL) closeFile(fileSource2);
      credits();
    } 
   return 0;
