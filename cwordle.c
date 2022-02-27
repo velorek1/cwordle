@@ -515,9 +515,10 @@ void displayHelp(){
    write_str(4,oldy+6,"-> LETTER IS IN THE WRONG POSITION", B_BLACK, F_WHITE);
    write_str(1,oldy+7,"[C]", B_BLACK, F_WHITE);
    write_str(4,oldy+7,"-> LETTER IS NOT IN THE WORD", B_BLACK, F_WHITE);
-   write_str(1,oldy+9,"Words: ", B_BLACK, F_GREY);
-   write_num(10,oldy+9,words, B_BLACK, F_GREY);
-   write_str(1,oldy+10, "Press <ENTER> or <ESC> key to return.", B_BLACK, F_WHITE);
+   write_str(1,oldy+9,"Type <cheat> to give up", B_BLACK, F_WHITE);
+   write_str(1,oldy+11,"Words: ", B_BLACK, F_GREY);
+   write_num(10,oldy+11,words, B_BLACK, F_GREY);
+   write_str(1,oldy+13, "Press <ENTER> or <ESC> key to return.", B_BLACK, F_WHITE);
    wherex=oldx;
    wherey=oldy;
    do{
@@ -621,15 +622,22 @@ for (i=0; i<5; i++) repeatedLetters[i] = 1;
 }
 void gameLoop(){
 char ch=0;
+int cheat=0;
   //calculate duplicate letters and assign powerWeights
 
   do{
+    cheat=0;
     memset(&textbox1,'\0',sizeof(textbox1));
      ch = textbox(1,wherey+2,5,"[+] Word:",textbox1,F_WHITE,F_WHITE,F_WHITE);
     //write_str(wherex+4,wherey+4,textbox1, B_BLACK,F_WHITE);
      if (ch == K_ESCAPE) break;
      if (strcmp(textbox1,"exit") ==0 || strcmp(textbox1,"quit") == 0)
       break;
+     if (strcmp(textbox1,"cheat") == 0){
+       write_str(18,oldy+20,secretWord, B_BLACK, F_GREEN);
+       memset(&textbox1,'\0',sizeof(textbox1));
+       cheat=1;
+      }
      if (strcmp(textbox1,"help") == 0)
        break;
       if (strlen(textbox1) == 5){
@@ -656,7 +664,7 @@ char ch=0;
          }
     }
      else{
-       write_str(wherex+16,wherey+2,"-> TOO SHORT!                         ", B_BLACK, F_RED);
+       if (cheat==0) write_str(wherex+16,wherey+2,"-> TOO SHORT!                         ", B_BLACK, F_RED);
     }
   } while (ch!= K_ESCAPE);
    write_str(1,wherey+2,"                                 ", B_BLACK,F_WHITE);
