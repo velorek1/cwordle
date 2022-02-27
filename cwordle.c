@@ -627,7 +627,7 @@ int cheat=0;
      if (strcmp(textbox1,"exit") ==0 || strcmp(textbox1,"quit") == 0)
       break;
      if (strcmp(textbox1,"cheat") == 0){
-       write_str(17,oldy+20,"                                           ", B_BLACK, F_GREEN);
+       write_str(17,oldy+20,"                                  ", B_BLACK, F_GREEN);
        write_str(18,oldy+20,secretWord, B_BLACK, F_GREEN);
        memset(&textbox1,'\0',sizeof(textbox1));
        cheat=1;
@@ -658,7 +658,7 @@ int cheat=0;
          }
     }
      else{
-       if (cheat==0) write_str(wherex+16,wherey+2,"->TOO SHORT!                          ", B_BLACK, F_RED);
+       if (cheat==0) write_str(wherex+16,wherey+2,"->TOO SHORT!                      ", B_BLACK, F_RED);
     }
   } while (ch!= K_ESCAPE);
    write_str(1,wherey+2,"                                 ", B_BLACK,F_WHITE);
@@ -768,7 +768,7 @@ void credits(){
   resetTerm();
   gotoxy(wherex,wherey+2);
   printf("\r");
-  printf("C-Wordle. Coded by v3l0r3k 2022                     \n");
+  printf("C-Wordle. Coded by v3l0r3k 2022                   \n");
   showcursor();
   resetAnsi(0);
 }
