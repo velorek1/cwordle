@@ -6,7 +6,7 @@ Wordle for Terminal.
 
 @version: 0.1
 @author: v3l0r3k
-- Last modified: 26/2/2022
+- Last modified: 27/2/2022
 */
 
 #include <stdio.h>
@@ -100,7 +100,7 @@ void pushTerm();
 int resetTerm();
 void cls();
 
-//USERT INTERFACE
+//USER INTERFACE
 void write_str(int wherex, int wherey, char *str, int backcolor, int forecolor);
 char textbox(int wherex, int wherey, int displayLength,char label[MAX_TEXTBOX], char text[MAX_TEXTBOX], int backcolor,
 	    int labelcolor, int textcolor);
@@ -259,7 +259,7 @@ int readch() {
 }
 
 void resetch() {
-//Clear ch
+//Clear keyboard buffer
   term1.c_cc[VMIN] = 0;
   tcsetattr(0, TCSANOW, &term1);
   peek_character = 0;
@@ -313,10 +313,12 @@ void write_str(int wherex, int wherey, char *str, int backcolor, int forecolor){
 }
 
 void write_ch(int wherex, int wherey, wchar_t ch, int backcolor, int forecolor){
+//Write unicode character
   gotoxy(wherex,wherey);
   outputcolor(backcolor,forecolor);
   printf("%lc", ch);
 }
+
 int write_num(int x, int y, int num, char backcolor, char forecolor) {
   //the length of the string must be passed on the function
   char   astr[30];
@@ -424,17 +426,11 @@ char textbox(int wherex, int wherey, int displayLength,
 
 void window(int x1, int y1, int x2, int y2, int backcolor,
          int bordercolor, int titlecolor, int border, int title) {
-/*
-   Chars for drawing box-like characters will be passed as negative values.
-   When the update_screen routine is called, it will check for negative
-   values and map these chars to Unicode characters.
- */
   int     i, j;
   i = x1;
   j = y1;
   //borders
   if(border == 1) {
-    //with borders. ANSI-ASCII 106-121
     for(i = x1; i <= x2; i++) {
       //upper and lower borders
       write_ch(i, y1, HOR_LINE, backcolor, bordercolor);   //horizontal line box-like char
@@ -622,13 +618,11 @@ for (i=0; i<5; i++) repeatedLetters[i] = 1;
 void gameLoop(){
 char ch=0;
 int cheat=0;
-  //calculate duplicate letters and assign powerWeights
 
   do{
     cheat=0;
     memset(&textbox1,'\0',sizeof(textbox1));
      ch = textbox(1,wherey+2,5,"[+] Word:",textbox1,F_WHITE,F_WHITE,F_WHITE);
-    //write_str(wherex+4,wherey+4,textbox1, B_BLACK,F_WHITE);
      if (ch == K_ESCAPE) break;
      if (strcmp(textbox1,"exit") ==0 || strcmp(textbox1,"quit") == 0)
       break;
@@ -673,13 +667,6 @@ int cheat=0;
      newGame();
   }
 }
-
-/*
-        if (isWordinDictionary(fileSource,textbox1) == 0) {
-           write_str(wherex+16,wherey+2,"-> NOT IN DICTIONARY!", B_BLACK, F_RED);
-         } else{
- */
-
 
 void newGame(){
 int i=0;
@@ -757,7 +744,7 @@ int isWordinDictionary(FILE * fileHandler, char WORD[MAX_TEXTBOX]) {
     rewind(fileHandler);	//Go to start of file
     ch = getc(fileHandler);	//peek into file
     while(!feof(fileHandler)) {
-      //Read until SEPARATOR '.'
+      //Read until SEPARATOR 0x0A
       if (ch != SEPARATOR) dataString[i] = ch;
       i++;
       if(ch == SEPARATOR) {
@@ -793,7 +780,6 @@ int main(){
    oldx = wherex;
    oldy = wherey;
    get_terminal_dimensions(&rows, &columns);
-   //printf("%d:%d\n", wherey, rows);
    if (rows < BOARDSIZEY || columns < BOARDSIZEX)
     {
       printf("Error: Terminal size is too small. Resize terminal. \n");
@@ -818,7 +804,6 @@ int main(){
      //Dictionary is present
      dictionaryPresent = 1;
      countWords(fileSource);
-     printf("Random word\n");
      words = countWords(fileSource);
      //Selecting a random word from dictionary
      randomWord = rand() % words;
@@ -826,7 +811,8 @@ int main(){
      pushTerm();
      hidecursor();
      resetch();
-      setlocale(LC_ALL, "");
+     //Set Locale For Unicode characters to work
+     setlocale(LC_ALL, "");
      //GAME
      newGame();
      if (fileSource != NULL) closeFile(fileSource);
