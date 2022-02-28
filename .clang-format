@@ -1,0 +1,8 @@
+ColumnLimit: 120
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+BreakBeforeBraces: Attach
+IndentWidth: 2
+PointerAlignment: Right
+AllowShortFunctionsOnASingleLine: None
