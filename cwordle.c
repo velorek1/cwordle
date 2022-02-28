@@ -78,7 +78,7 @@ int rows=0,columns=0;
 int wherey=0, wherex=0;
 int oldy=0, oldx=0;
 int currentIndex = 0;
-int     okFile;
+int     okFile, okFile2;
 int dictionaryPresent = 0;
 FILE   *fileSource;
 FILE   *fileSource2;
@@ -798,13 +798,13 @@ int main(){
    }
    //SEARCH FOR DICTIONARY
    okFile = openFile(&fileSource, DICTIONARY, "r");
-   okFile = openFile(&fileSource2, POSSIBLES, "r");
-   if (okFile == 0) {
+   okFile2 = openFile(&fileSource2, POSSIBLES, "r");
+   if (okFile == 0 || okFile2 == 0) {
      //No dictionary
      dictionaryPresent = 0;
      words = 1;
      strcpy(secretWord, dummyWord);
-     printf("ERROR: Dictionary not found. Create file <dict.txt>\n");
+     printf("ERROR: Dictionary file(s) is missing. Create file <dict.txt> and/or <possibles.txt>\n");
      exit(0);
    } else {
      //Dictionary is present
