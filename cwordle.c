@@ -65,25 +65,25 @@ Wordle for Terminal.
 #define BOARDSIZEX 35
 // GLOBALS
 // Game
-char                  boardInputs[7][6];
-char                  secretWord[6];
+char                  board_inputs[7][6];
+char                  secret_word[6];
 char                  textbox1[MAX_TEXTBOX];
-int                   repeatedLetters[5] = {1, 1, 1, 1, 1};
+int                   repeated_letters[5] = {1, 1, 1, 1, 1};
 char                  textbox1[MAX_TEXTBOX];
-int                   checkTrue[5] = {0, 0, 0, 0, 0};
+int                   check_true[5] = {0, 0, 0, 0, 0};
 struct winsize        max;
 static struct termios term1, term2, failsafe;
 static int            peek_character = -1;
 int                   rows = 0, columns = 0;
 int                   wherey = 0, wherex = 0;
 int                   oldy = 0, oldx = 0;
-int                   currentIndex = 0;
-int                   okFile;
-int                   dictionaryPresent = 0;
-FILE                 *fileSource;
-FILE                 *fileSource2;
+int                   current_index = 0;
+int                   ok_file;
+int                   dictionary_present = 0;
+FILE                 *file_source;
+FILE                 *file_source2;
 time_t                t;
-unsigned              randomWord = 0;
+unsigned              random_word = 0;
 unsigned              words      = 0;
 unsigned              words2     = 0;
 // PROTOTYPES
@@ -98,9 +98,9 @@ int  get_terminal_dimensions(int *rows, int *columns);
 int  get_pos(int *y, int *x);
 void hidecursor();
 void showcursor();
-void resetAnsi(int x);
-void pushTerm();
-int  resetTerm();
+void reset_ansi(int x);
+void push_term();
+int  reset_term();
 void cls();
 
 // USER INTERFACE
@@ -111,32 +111,32 @@ void write_ch(int wherex, int wherey, wchar_t ch, int backcolor, int forecolor);
 int  write_num(int x, int y, int num, char backcolor, char forecolor);
 void window(int x1, int y1, int x2, int y2, int backcolor, int bordercolor, int titlecolor, int border, int title);
 
-void toUpper(char *text);
+void to_upper(char *text);
 // Game
-void newGame();
-void gameLoop();
-void displayHelp();
-void drawBoard();
+void new_game();
+void game_loop();
+void display_help();
+void draw_board();
 void credits();
-int  checkGreen(char c, int index, char *str);
-int  checkOrange(char c, int index, char *str);
-void checkRepeatedLetters();
-void writeWord(int index, char text[MAX_TEXTBOX]);
-void cleanArea();
-int  findIndex(char c);
+int  check_green(char c, int index, char *str);
+int  check_orange(char c, int index, char *str);
+void check_repeated_letters();
+void write_word(int index, char text[MAX_TEXTBOX]);
+void clean_area();
+int  find_index(char c);
 // FILE
-int  openFile(FILE **fileHandler, char *fileName, char *mode);
-long countWords(FILE *fileHandler);
-void getWordfromDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]);
-int  isWordinDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]);
-int  closeFile(FILE *fileHandler);
+int  open_file(FILE **fileHandler, char *fileName, char *mode);
+long count_words(FILE *fileHandler);
+void get_wordfrom_dictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]);
+int  is_wordin_dictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]);
+int  close_file(FILE *fileHandler);
 // Terminal Routines
 //----------------
 
 /*-------------------------------------*/
 /* Initialize new terminal i/o settings*/
 /*-------------------------------------*/
-void pushTerm() {
+void push_term() {
   // Save terminal settings in failsafe to be retrived at the end
   tcgetattr(0, &failsafe);
 }
@@ -144,7 +144,7 @@ void pushTerm() {
 /*---------------------------*/
 /* Reset terminal to failsafe*/
 /*---------------------------*/
-int resetTerm() {
+int reset_term() {
   // tcsetattr(0, TCSANOW, &failsafe);
   /* flush and reset */
   if (tcsetattr(0, TCSAFLUSH, &failsafe) < 0)
@@ -280,7 +280,7 @@ void outputcolor(int foreground, int background) {
 }
 
 /*-----------------------*/
-void resetAnsi(int x) {
+void reset_ansi(int x) {
   switch (x) {
   case 0: // reset all colors and attributes
     printf("%c[0m", 0x1b);
@@ -330,21 +330,21 @@ int write_num(int x, int y, int num, char backcolor, char forecolor) {
 
 char textbox(int wherex, int wherey, int displayLength, char label[MAX_TEXTBOX], char text[MAX_TEXTBOX], int backcolor,
              int labelcolor, int textcolor) {
-  int  charCount   = 0;
-  int  exitFlag    = 0;
-  int  cursorON    = 1;
-  long cursorCount = 0;
+  int  char_count   = 0;
+  int  exit_flag    = 0;
+  int  cursor_on    = 1;
+  long cursor_count = 0;
   int  i;
-  int  limitCursor = 0;
+  int  limit_cursor = 0;
   int  positionx   = 0;
-  int  posCursor   = 0;
+  int  pos_cursor   = 0;
   int  keypressed  = 0;
-  char displayChar;
+  char display_char;
   char ch;
   strcpy(text, "");
   text[0]     = '\0';
   positionx   = wherex + strlen(label);
-  limitCursor = wherex + strlen(label) + displayLength + 1;
+  limit_cursor = wherex + strlen(label) + displayLength + 1;
   write_str(wherex, wherey, label, backcolor, labelcolor);
 
   write_ch(positionx, wherey, '[', backcolor, textcolor);
@@ -362,26 +362,26 @@ char textbox(int wherex, int wherey, int displayLength, char label[MAX_TEXTBOX],
     // Cursor Animation
     if (keypressed == 0) {
 
-      cursorCount++;
-      if (cursorCount == 100) {
-        cursorCount = 0;
-        switch (cursorON) {
+      cursor_count++;
+      if (cursor_count == 100) {
+        cursor_count = 0;
+        switch (cursor_on) {
         case 1:
-          posCursor   = positionx + 1;
-          displayChar = '.';
-          if (posCursor == limitCursor) {
-            posCursor   = posCursor - 1;
-            displayChar = ch;
+          pos_cursor   = positionx + 1;
+          display_char = '.';
+          if (pos_cursor == limit_cursor) {
+            pos_cursor   = pos_cursor - 1;
+            display_char = ch;
           }
-          write_ch(posCursor, wherey, displayChar, backcolor, textcolor);
-          cursorON = 0;
+          write_ch(pos_cursor, wherey, display_char, backcolor, textcolor);
+          cursor_on = 0;
           break;
         case 0:
-          posCursor = positionx + 1;
-          if (posCursor == limitCursor)
-            posCursor = posCursor - 1;
-          write_ch(posCursor, wherey, '|', backcolor, textcolor);
-          cursorON = 1;
+          pos_cursor = positionx + 1;
+          if (pos_cursor == limit_cursor)
+            pos_cursor = pos_cursor - 1;
+          write_ch(pos_cursor, wherey, '|', backcolor, textcolor);
+          cursor_on = 1;
           break;
         }
       }
@@ -391,33 +391,33 @@ char textbox(int wherex, int wherey, int displayLength, char label[MAX_TEXTBOX],
       ch         = readch();
       keypressed = 0;
 
-      if (charCount < displayLength) {
+      if (char_count < displayLength) {
         if (ch > 31 && ch < 127) {
           write_ch(positionx + 1, wherey, ch, backcolor, textcolor);
-          text[charCount] = ch;
+          text[char_count] = ch;
           positionx++;
-          charCount++;
+          char_count++;
         }
       }
     }
 
     if (ch == K_BACKSPACE) {
-      if (positionx > 0 && charCount > 0) {
+      if (positionx > 0 && char_count > 0) {
         positionx--;
-        charCount--;
+        char_count--;
         write_ch(positionx + 1, wherey, '.', backcolor, textcolor);
-        if (positionx < limitCursor - 2)
+        if (positionx < limit_cursor - 2)
           write_ch(positionx + 2, wherey, '.', backcolor, textcolor);
         resetch();
       }
     }
     if (ch == K_ENTER || ch == K_ESCAPE)
-      exitFlag = 1;
+      exit_flag = 1;
 
     // ENTER OR ESC TO FINISH LOOP
-  } while (exitFlag != 1);
+  } while (exit_flag != 1);
   // clear cursor
-  write_ch(posCursor, wherey, ' ', backcolor, textcolor);
+  write_ch(pos_cursor, wherey, ' ', backcolor, textcolor);
   resetch();
   return ch;
 }
@@ -449,7 +449,7 @@ void window(int x1, int y1, int x2, int y2, int backcolor, int bordercolor, int 
   }
 }
 
-void toUpper(char *text) {
+void to_upper(char *text) {
   // CHANGE LETTERS TO UPPERCASE
   size_t i = 0;
   for (i = 0; i < strlen(text); i++) {
@@ -460,11 +460,11 @@ void toUpper(char *text) {
 
 // GAME FUNCTIONS
 
-void drawBoard() {
+void draw_board() {
   int i = 0, j = 0, shiftx = 0, shifty = 0;
-  int sizeX = 4;
-  int sizeY = 2;
-  cleanArea();
+  int size_x = 4;
+  int size_y = 2;
+  clean_area();
   shiftx = wherex + 4;
   shifty = wherey;
   write_str(wherex, wherey, "[C WORDLE FOR TERMINAL by        ]", B_BLACK, F_WHITE);
@@ -473,10 +473,10 @@ void drawBoard() {
 
   for (j = 0; j < 6; j++) {
     for (i = 0; i < 5; i++) {
-      window(shiftx, shifty + 1, (shiftx + sizeX), shifty + 1 + sizeY, B_BLACK, F_WHITE, F_WHITE, 1, 0);
-      shiftx = shiftx + sizeX + 1;
+      window(shiftx, shifty + 1, (shiftx + size_x), shifty + 1 + size_y, B_BLACK, F_WHITE, F_WHITE, 1, 0);
+      shiftx = shiftx + size_x + 1;
     }
-    shifty = shifty + sizeY + 1;
+    shifty = shifty + size_y + 1;
     shiftx = wherex + 4;
   }
   wherey = shifty;
@@ -484,7 +484,7 @@ void drawBoard() {
   write_str(wherex, wherey + 1, "[ESC: EXIT | TYPE <help> for more]", B_BLACK, F_GREY);
 }
 
-void cleanArea() {
+void clean_area() {
   int i = 0, j = 0;
   for (j = 0; j < BOARDSIZEY; j++) {
     for (i = 0; i < 50; i++) {
@@ -493,9 +493,9 @@ void cleanArea() {
   }
 }
 
-void displayHelp() {
+void display_help() {
   char ch = 0;
-  cleanArea();
+  clean_area();
   write_str(1, oldy, "C-WORDLE", B_WHITE, F_BLACK);
   write_str(1, oldy + 1, "Guess a 5-letter secret word in 6 tries.", B_BLACK, F_WHITE);
   write_str(1, oldy + 2, "Type any word to start.", B_BLACK, F_WHITE);
@@ -522,16 +522,16 @@ void displayHelp() {
     if (ch == K_ESCAPE)
       break;
   } while (ch != K_ENTER);
-  cleanArea();
+  clean_area();
 }
 
-int findIndex(char c)
+int find_index(char c)
 // returns the index of a char in an array of chars
 {
   int  i  = 0;
   char ch = 0;
   do {
-    ch = secretWord[i];
+    ch = secret_word[i];
     if (c == ch)
       break;
     i++;
@@ -539,87 +539,87 @@ int findIndex(char c)
   return i;
 }
 
-int checkGreen(char c, int index, char *str) {
+int check_green(char c, int index, char *str) {
   char   ch          = 0;
   size_t i           = 0;
   size_t lindex      = index;
   int    col         = B_BLACK;
-  int    letterIndex = 0;
+  int    letter_index = 0;
   // color letters accordingly
-  letterIndex = findIndex(c);
+  letter_index = find_index(c);
   for (i = 0; i < strlen(str); i++) {
     ch = str[i];
     if (c == ch && lindex == i) {
       col          = B_GREEN;
-      checkTrue[i] = 1;
-      repeatedLetters[letterIndex]--;
+      check_true[i] = 1;
+      repeated_letters[letter_index]--;
     }
   }
   return col;
 }
 
-int checkOrange(char c, int index, char *str) {
+int check_orange(char c, int index, char *str) {
   char   ch  = 0;
   size_t i   = 0;
-  int    col = B_BLACK, letterIndex = 0;
+  int    col = B_BLACK, letter_index = 0;
 
-  letterIndex = findIndex(c);
+  letter_index = find_index(c);
   // color letters accordingly
   for (i = 0; i < strlen(str); i++) {
     ch = str[i];
-    if (c == ch && repeatedLetters[letterIndex] > 0 && checkTrue[index] == 0) {
+    if (c == ch && repeated_letters[letter_index] > 0 && check_true[index] == 0) {
       col = B_YELLOW;
-      repeatedLetters[letterIndex]--;
+      repeated_letters[letter_index]--;
       break;
     }
   }
-  if (checkTrue[index] == 1)
+  if (check_true[index] == 1)
     col = B_GREEN;
   return col;
 }
 
-void writeWord(int index, char text[MAX_TEXTBOX]) {
+void write_word(int index, char text[MAX_TEXTBOX]) {
   int j = 0, i = 0, x = 0, y = 0, col = B_BLACK;
   x = oldx + 6;
   y = oldy + 2;
 
-  checkRepeatedLetters();
+  check_repeated_letters();
   for (j = 0; j < index; j++)
     y = y + 3;
   // clean array of true values
   for (i = 0; i < 5; i++)
-    checkTrue[i] = 0;
+    check_true[i] = 0;
   // Search for Green letters
   for (i = 0; i < MAX_TEXTBOX; i++) {
-    col = checkGreen(text[i], i, secretWord);
+    col = check_green(text[i], i, secret_word);
     write_ch(x, y, text[i], col, F_WHITE);
     x = x + 5;
   }
   // Search for Orange and Black letters
   x = oldx + 6;
   for (i = 0; i < 5; i++) {
-    col = checkOrange(text[i], i, secretWord);
+    col = check_orange(text[i], i, secret_word);
     write_ch(x, y, text[i], col, F_WHITE);
     x = x + 5;
   }
 }
 
-void checkRepeatedLetters() {
+void check_repeated_letters() {
   char   ch = 0;
   size_t i, j;
   for (i = 0; i < 5; i++)
-    repeatedLetters[i] = 1;
-  for (i = 0; i < strlen(secretWord); i++) {
-    ch = secretWord[i];
-    for (j = i + 1; j < strlen(secretWord); j++) {
-      if (ch == secretWord[j]) {
-        repeatedLetters[i] = repeatedLetters[i] + 1;
-        repeatedLetters[j] = repeatedLetters[i];
+    repeated_letters[i] = 1;
+  for (i = 0; i < strlen(secret_word); i++) {
+    ch = secret_word[i];
+    for (j = i + 1; j < strlen(secret_word); j++) {
+      if (ch == secret_word[j]) {
+        repeated_letters[i] = repeated_letters[i] + 1;
+        repeated_letters[j] = repeated_letters[i];
       }
     }
   }
 }
-void gameLoop() {
+void game_loop() {
   char ch    = 0;
   int  cheat = 0;
 
@@ -633,29 +633,29 @@ void gameLoop() {
       break;
     if (strcmp(textbox1, "cheat") == 0) {
       write_str(17, oldy + 20, "                                  ", B_BLACK, F_GREEN);
-      write_str(18, oldy + 20, secretWord, B_BLACK, F_GREEN);
+      write_str(18, oldy + 20, secret_word, B_BLACK, F_GREEN);
       memset(&textbox1, '\0', sizeof(textbox1));
       cheat = 1;
     }
     if (strcmp(textbox1, "help") == 0)
       break;
     if (strlen(textbox1) == 5) {
-      checkRepeatedLetters();
-      toUpper(textbox1);
+      check_repeated_letters();
+      to_upper(textbox1);
 
-      if (isWordinDictionary(fileSource, textbox1) == 1) {
-        writeWord(currentIndex, textbox1);
-        strcpy(boardInputs[currentIndex], textbox1);
+      if (is_wordin_dictionary(file_source, textbox1) == 1) {
+        write_word(current_index, textbox1);
+        strcpy(board_inputs[current_index], textbox1);
         write_str(wherex + 16, wherey + 2, "->VALID WORD!                   ", B_BLACK, F_GREEN);
-        if (currentIndex < 6)
-          currentIndex++;
-        if (strcmp(textbox1, secretWord) == 0) {
+        if (current_index < 6)
+          current_index++;
+        if (strcmp(textbox1, secret_word) == 0) {
           write_str(wherex, wherey + 1, "->SUCCESS!                        ", B_BLACK, F_BLUE);
           break;
         } else {
-          if (currentIndex == 6) {
+          if (current_index == 6) {
             write_str(wherex, wherey + 1, "->GAME OVER:                     ", B_BLACK, F_MAGENTA);
-            write_str(wherex + 14, wherey + 1, secretWord, B_BLACK, F_GREEN);
+            write_str(wherex + 14, wherey + 1, secret_word, B_BLACK, F_GREEN);
             break;
           }
         }
@@ -669,23 +669,23 @@ void gameLoop() {
   } while (ch != K_ESCAPE);
   write_str(1, wherey + 2, "                                 ", B_BLACK, F_WHITE);
   if (strcmp(textbox1, "help") == 0) {
-    displayHelp();
-    newGame();
+    display_help();
+    new_game();
   }
 }
 
-void newGame() {
+void new_game() {
   int i = 0;
-  drawBoard();
+  draw_board();
   // Rewrite previous words on panel
-  if (currentIndex > 0) {
-    for (i = 0; i <= currentIndex; i++)
-      writeWord(i, boardInputs[i]);
+  if (current_index > 0) {
+    for (i = 0; i <= current_index; i++)
+      write_word(i, board_inputs[i]);
   }
-  gameLoop();
+  game_loop();
 }
 
-int openFile(FILE **fileHandler, char *fileName, char *mode) {
+int open_file(FILE **fileHandler, char *fileName, char *mode) {
   int ok;
   *fileHandler = fopen(fileName, mode);
   // check whether buffer is assigned
@@ -697,8 +697,8 @@ int openFile(FILE **fileHandler, char *fileName, char *mode) {
   return ok;
 }
 
-long countWords(FILE *fileHandler) {
-  long wordCount = 0;
+long count_words(FILE *fileHandler) {
+  long word_count = 0;
   char ch;
 
   // Read char by char
@@ -708,43 +708,43 @@ long countWords(FILE *fileHandler) {
     while (!feof(fileHandler)) {
       // Read until SEPARATOR 0x0A
       if (ch == SEPARATOR) {
-        wordCount++;
+        word_count++;
       }
       ch = getc(fileHandler);
     }
   }
-  return wordCount;
+  return word_count;
 }
 
-void getWordfromDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
+void get_wordfrom_dictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
   long i = 0;
   char ch;
-  char dataString[MAX_TEXTBOX];
+  char data_string[MAX_TEXTBOX];
 
   // Read char by char
   if (fileHandler != NULL) {
     rewind(fileHandler);
     // Go to where the word starts 6bytes * randomWord
-    fseek(fileHandler, MAX_TEXTBOX * randomWord, SEEK_SET);
+    fseek(fileHandler, MAX_TEXTBOX * random_word, SEEK_SET);
     ch = getc(fileHandler); // peek into file
     while (i < 5) {
       // Read until SEPARATOR 0x0A
       if (ch != SEPARATOR)
-        dataString[i++] = ch;
+        data_string[i++] = ch;
       // i++;
       ch = getc(fileHandler);
     }
   }
-  dataString[i] = '\0'; // null-end string
+  data_string[i] = '\0'; // null-end string
   i             = 0;
-  strcpy(WORD, dataString);
+  strcpy(WORD, data_string);
 }
 
-int isWordinDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
+int is_wordin_dictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
   long i       = 0;
-  int  isFound = 0;
+  int  is_found = 0;
   char ch;
-  char dataString[MAX_TEXTBOX];
+  char data_string[MAX_TEXTBOX];
 
   // Read char by char
   if (fileHandler != NULL) {
@@ -753,12 +753,12 @@ int isWordinDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
     while (!feof(fileHandler)) {
       // Read until SEPARATOR 0x0A
       if (ch != SEPARATOR)
-        dataString[i++] = ch;
+        data_string[i++] = ch;
       // i++;
       if (ch == SEPARATOR) {
-        dataString[i] = '\0'; // null-end string
-        if (strcmp(dataString, WORD) == 0) {
-          isFound = 1;
+        data_string[i] = '\0'; // null-end string
+        if (strcmp(data_string, WORD) == 0) {
+          is_found = 1;
           break;
         }
         i = 0;
@@ -766,22 +766,22 @@ int isWordinDictionary(FILE *fileHandler, char WORD[MAX_TEXTBOX]) {
       ch = getc(fileHandler);
     }
   }
-  return isFound;
+  return is_found;
 }
 
-int closeFile(FILE *fileHandler) {
+int close_file(FILE *fileHandler) {
   int ok;
   ok = fclose(fileHandler);
   return ok;
 }
 
 void credits() {
-  resetTerm();
+  reset_term();
   gotoxy(wherex, wherey + 2);
   printf("\r");
   printf("C-Wordle. Coded by v3l0r3k 2022                   \n");
   showcursor();
-  resetAnsi(0);
+  reset_ansi(0);
 }
 
 int main() {
@@ -802,34 +802,34 @@ int main() {
     oldy = wherey;
   }
   // SEARCH FOR DICTIONARY
-  okFile = openFile(&fileSource, DICTIONARY, "r");
-  okFile = openFile(&fileSource2, POSSIBLES, "r");
-  if (okFile == 0) {
+  ok_file = open_file(&file_source, DICTIONARY, "r");
+  ok_file = open_file(&file_source2, POSSIBLES, "r");
+  if (ok_file == 0) {
     // No dictionary
-    dictionaryPresent = 0;
+    dictionary_present = 0;
     words             = 1;
-    strcpy(secretWord, dummyWord);
+    strcpy(secret_word, dummyWord);
     printf("ERROR: Dictionary not found. Create file <dict.txt>\n");
     exit(0);
   } else {
     // Dictionary is present
-    dictionaryPresent = 1;
-    words             = countWords(fileSource);
-    words2            = countWords(fileSource2);
+    dictionary_present = 1;
+    words             = count_words(file_source);
+    words2            = count_words(file_source2);
     // Selecting a random word from dictionary
-    randomWord = rand() % words2;
-    getWordfromDictionary(fileSource2, secretWord);
-    pushTerm();
+    random_word = rand() % words2;
+    get_wordfrom_dictionary(file_source2, secret_word);
+    push_term();
     hidecursor();
     resetch();
     // Set Locale For Unicode characters to work
     setlocale(LC_ALL, "");
     // GAME
-    newGame();
-    if (fileSource != NULL)
-      closeFile(fileSource);
-    if (fileSource2 != NULL)
-      closeFile(fileSource2);
+    new_game();
+    if (file_source != NULL)
+      close_file(file_source);
+    if (file_source2 != NULL)
+      close_file(file_source2);
     credits();
   }
   return 0;
