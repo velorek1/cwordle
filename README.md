@@ -1,7 +1,7 @@
 # cwordle
 Wordle clone for Terminals in C 
 -
-**NEWLY ADDED -> CWIN.C (WINDOWS VERSION)**
+**NEWLY ADDED -> CWIN.C (WINDOWS VERSION) and .apk for ANDROID**
 
 TO COMPILE:  
 Download or clone repository.
