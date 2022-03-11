@@ -18,14 +18,13 @@ Wordle for Terminal.
 #include <locale.h>
 #include <time.h>
 #include <wchar.h>
-#include "config.h"
 
 #define dummyWord "ERASE\0"
 #define MAX_TEXTBOX 6
 //words in the dictionary file should have 5 chars and a 0x0A at the end
 #define SEPARATOR 0x0A
-#define DICTIONARY DATA_DIR "/dict.txt"
-#define POSSIBLES DATA_DIR "/possible.txt"
+#define DICTIONARY "dict.txt"
+#define POSSIBLES "possible.txt"
 
 //UNICODE chars
 #define HOR_LINE 9472
