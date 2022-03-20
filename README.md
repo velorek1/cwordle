@@ -6,7 +6,7 @@ Wordle clone for Terminals in C
 TO COMPILE:  
 Download or clone repository.
 
-    * gcc cwordle.c -o cw  
+    * gcc cw.c -o cw  
     * (Alternatively, use script "bash build.sh")
     * "./cw" to execute.
     
