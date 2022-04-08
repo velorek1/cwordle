@@ -11,6 +11,7 @@ Download or clone repository.
     * "./cw" to execute.
     
 TO INSTALL:
+
     * Download or clone repository
     * cd cwordle
     * cmake .  
