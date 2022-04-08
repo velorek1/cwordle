@@ -12,7 +12,7 @@ Download or clone repository.
     
 TO INSTALL:
 
-    * Download or clone repository
+    * Download or clone repository && Install cmake.
     * cd cwordle
     * cmake .  
     * sudo make install
