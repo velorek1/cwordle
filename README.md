@@ -10,6 +10,13 @@ Download or clone repository.
     * (Alternatively, use script "bash build.sh")
     * "./cw" to execute.
     
+TO INSTALL:
+    * Download or clone repository
+    * cd cwordle
+    * cmake .  
+    * sudo make install
+    * "cwordle" to execute.
+
 Dictionary by Donald Knuth at Stanford University. 
 (https://homepage.cs.uiowa.edu/~sriram/21/fall04/words.html)
 
